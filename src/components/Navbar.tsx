@@ -11,7 +11,7 @@ const Navbar = () => {
     // Map nav item names to their respective app routing links
     const navItems = [
         { name: 'Home', href: '/' },
-        { name: 'All Appointments', href: '/appointments' },
+        { name: 'All Appointments', href: '/all-appointments' },
         { name: 'Dashboard', href: '/dashboard' }
     ];
 
