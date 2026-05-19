@@ -6,6 +6,7 @@ const HomePage = () => {
     <div>
       <HeroBanner/>
       <TopRatedDoctors/>
+      <Extr/>
     </div>
   )
 }
