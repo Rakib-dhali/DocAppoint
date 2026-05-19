@@ -1,53 +1,47 @@
 "use client";
 
 import { MapPin, Building2 } from "lucide-react";
+import { use, useEffect, useState } from "react";
 
-const doctors = [
-  {
-    id: 1,
-    name: "Dr. Sarah Johnson",
-    specialty: "CARDIOLOGY",
-    clinic: "City Heart Center",
-    location: "Manhattan, NY",
-    rating: "4.9",
-    price: "$800",
-    image:
-      "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    id: 2,
-    name: "Dr. Michael Chen",
-    specialty: "NEUROLOGY",
-    clinic: "Neuro Health Institute",
-    location: "Brooklyn, NY",
-    rating: "4.8",
-    price: "$800",
-    image:
-      "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    id: 3,
-    name: "Dr. Emily Watson",
-    specialty: "PEDIATRICS",
-    clinic: "Children First Care",
-    location: "Queens, NY",
-    rating: "5.0",
-    price: "$800",
-    image:
-      "https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=1200&auto=format&fit=crop",
-  },
-];
+
+interface Doctor {
+  _id: string;
+  id: string;
+  name: string;
+  specialty: string;
+  image: string;
+  experience: string;
+  availability: string[];
+  description: string;
+  hospital: string;
+  location: string;
+  fee: number;
+  rating: number;
+}
+
 
 export default function TopRatedDoctors() {
+  const [doctors, setTopDoctors] = useState<Doctor[]>([]);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const response = await fetch("http://localhost:4000/api/top-doctors");
+        const data = await response.json();
+        setTopDoctors(data);
+      } catch (error) {
+        console.error("Error retrieving doctor information:", error);
+      }
+    };
+    fetchDoctors();
+  }, []);
+
   return (
-    <section className="w-full bg-[#eef4fc] mx-auto max-w-7xl bg-white px-6 md:px-12 lg:px-18 xl:px-24">
+    <section className="w-full bg-white mx-auto max-w-7xl px-6 md:px-12 lg:px-18 xl:px-24 mt-20">
       <div className="mx-auto max-w-7xl">
         {/* Heading */}
         <div className="mb-8 flex items-center gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8ca2d2]">
-            Specialists
-          </span>
-          <h2 className="text-2xl font-bold text-[#1d1d1f] md:text-3xl">
+          <h2 className="text-2xl font-bold text-[#1d1d1f] md:text-3xl text-center">
             Our Top Rated Doctors
           </h2>
         </div>
@@ -91,7 +85,7 @@ export default function TopRatedDoctors() {
                 {/* Clinic */}
                 <div className="mt-3 flex items-center gap-2 text-sm text-[#7d8699]">
                   <Building2 size={14} />
-                  <span>{doctor.clinic}</span>
+                  <span>{doctor.hospital}</span>
                 </div>
 
                 {/* Location */}
@@ -103,10 +97,10 @@ export default function TopRatedDoctors() {
                 {/* Bottom */}
                 <div className="mt-5 flex items-center justify-between">
                   <span className="text-[24px] font-extrabold text-[#1f52ff]">
-                    {doctor.price}
+                    {doctor.fee}
                   </span>
 
-                  <button className="rounded-full bg-[#2f7dff] px-5 py-2 text-sm font-medium text-white shadow-md transition hover:scale-105 hover:bg-[#256eff]">
+                  <button className="rounded-full bg-linear-to-r bg-blue-700 to-sky-500 hover:from-blue-800 hover:to-sky-600 px-5 py-2 text-sm font-medium text-white shadow-md transition-colors duration-200 ease-in-out">
                     View Details
                   </button>
                 </div>

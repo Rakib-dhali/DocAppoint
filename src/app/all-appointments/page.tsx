@@ -1,8 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, Star, Calendar, RefreshCcw, Briefcase, MapPin } from "lucide-react";
+import {
+  Search,
+  Star,
+  Calendar,
+  RefreshCcw,
+  Briefcase,
+  MapPin,
+} from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 // Define the precise object shape returning from your API
 interface Doctor {
@@ -29,7 +37,8 @@ export default function AllAppointments() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedRating, setSelectedRating] = useState<string>("Any Rating");
   const [selectedFee, setSelectedFee] = useState<string>("Any Price");
-  const [selectedExperience, setSelectedExperience] = useState<string>("Any Experience");
+  const [selectedExperience, setSelectedExperience] =
+    useState<string>("Any Experience");
 
   // Fetching data from API endpoint
   useEffect(() => {
@@ -65,7 +74,8 @@ export default function AllAppointments() {
     let matchesFee = true;
     if (selectedFee !== "Any Price") {
       if (selectedFee === "Under 700") matchesFee = doctor.fee < 700;
-      else if (selectedFee === "700 - 1000") matchesFee = doctor.fee >= 700 && doctor.fee <= 1000;
+      else if (selectedFee === "700 - 1000")
+        matchesFee = doctor.fee >= 700 && doctor.fee <= 1000;
       else if (selectedFee === "Above 1000") matchesFee = doctor.fee > 1000;
     }
 
@@ -73,9 +83,12 @@ export default function AllAppointments() {
     let matchesExperience = true;
     if (selectedExperience !== "Any Experience") {
       const expYears = parseInt(doctor.experience);
-      if (selectedExperience === "Under 5 Years") matchesExperience = expYears < 5;
-      else if (selectedExperience === "5 - 10 Years") matchesExperience = expYears >= 5 && expYears <= 10;
-      else if (selectedExperience === "10+ Years") matchesExperience = expYears > 10;
+      if (selectedExperience === "Under 5 Years")
+        matchesExperience = expYears < 5;
+      else if (selectedExperience === "5 - 10 Years")
+        matchesExperience = expYears >= 5 && expYears <= 10;
+      else if (selectedExperience === "10+ Years")
+        matchesExperience = expYears > 10;
     }
 
     return matchesSearch && matchesRating && matchesFee && matchesExperience;
@@ -92,21 +105,20 @@ export default function AllAppointments() {
   return (
     <section className="min-h-screen bg-[#f3f8ff] py-16 px-6 sm:px-12 lg:px-24">
       <div className="max-w-7xl mx-auto w-full">
-        
         {/* ================= HEADER SECTION ================= */}
         <div className="text-center max-w-2xl mx-auto mb-12">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Find Your Doctor
           </h1>
           <p className="mt-3 text-slate-500 text-sm sm:text-base leading-relaxed">
-            Access top-rated medical professionals and book your next appointment in seconds with our transparent scheduling system.
+            Access top-rated medical professionals and book your next
+            appointment in seconds with our transparent scheduling system.
           </p>
         </div>
 
         {/* ================= SEARCH & FILTER CONTROL PANEL ================= */}
         <div className="bg-white rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.02)] border border-slate-200/60 p-4 sm:p-5 mb-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
-            
             {/* Input Search Box */}
             <div className="lg:col-span-6 space-y-2">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
@@ -118,7 +130,9 @@ export default function AllAppointments() {
                   type="text"
                   placeholder="e.g. Dr. Sarah Johnson or Cardiology"
                   value={searchQuery}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setSearchQuery(e.target.value)
+                  }
                   className="w-full pl-11 pr-4 py-2.5 bg-white border border-slate-200 text-slate-800 placeholder-slate-400 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                 />
               </div>
@@ -131,7 +145,9 @@ export default function AllAppointments() {
               </label>
               <select
                 value={selectedRating}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedRating(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  setSelectedRating(e.target.value)
+                }
                 className="w-full px-3 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
               >
                 <option>Any Rating</option>
@@ -147,7 +163,9 @@ export default function AllAppointments() {
               </label>
               <select
                 value={selectedFee}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedFee(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  setSelectedFee(e.target.value)
+                }
                 className="w-full px-3 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
               >
                 <option>Any Price</option>
@@ -164,7 +182,9 @@ export default function AllAppointments() {
               </label>
               <select
                 value={selectedExperience}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedExperience(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  setSelectedExperience(e.target.value)
+                }
                 className="w-full px-3 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
               >
                 <option>Any Experience</option>
@@ -173,7 +193,6 @@ export default function AllAppointments() {
                 <option>10+ Years</option>
               </select>
             </div>
-
           </div>
         </div>
 
@@ -184,23 +203,21 @@ export default function AllAppointments() {
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
           </div>
         ) : filteredDoctors.length > 0 ? (
-          
           /* Doctor Cards Results Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredDoctors.map((doctor) => (
-              <div 
-                key={doctor._id} 
+              <div
+                key={doctor._id}
                 className="bg-white rounded-2xl border border-slate-100 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.04)] transition-all duration-300 flex flex-col justify-between"
               >
                 <div>
                   {/* Card Info Header Area */}
                   <div className="flex gap-4 items-start">
                     <Image
-                      src={doctor.image} 
-                      alt={doctor.name} 
+                      src={doctor.image}
+                      alt={doctor.name}
                       height={72}
                       width={72}
-                      
                       className="aspect-square rounded-xl object-cover bg-slate-100 shrink-0"
                     />
                     <div className="space-y-1 min-w-0">
@@ -225,7 +242,8 @@ export default function AllAppointments() {
 
                   {/* Card Body Snippet Block */}
                   <p className="text-xs text-slate-500 leading-relaxed mt-4 line-clamp-2">
-                    {doctor.description || `Specialized consulting at ${doctor.hospital}.`}
+                    {doctor.description ||
+                      `Specialized consulting at ${doctor.hospital}.`}
                   </p>
                 </div>
 
@@ -237,35 +255,48 @@ export default function AllAppointments() {
                     </span>
                     <span className="text-xs font-bold text-slate-800 flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5 text-blue-500" />
-                      {doctor.availability?.[0]?.split(" - ")?.[0] || "Tomorrow, 9 AM"}
+                      {doctor.availability?.[0]?.split(" - ")?.[0] ||
+                        "Tomorrow, 9 AM"}
                     </span>
                   </div>
-                  <button className="px-4 py-2 bg-linear-to-r from bg-blue-700 to-sky-500 hover:from-blue-800 hover:to-sky-600 text-white text-xs font-bold rounded-xl transition duration-300 ease-in-out shadow-sm cursor-pointer">
-                    Book Now
-                  </button>
+                  <Link href={`/all-appointments/${doctor._id}`}>                    <button className="px-4 py-2 bg-linear-to-r from bg-blue-700 to-sky-500 hover:from-blue-800 hover:to-sky-600 text-white text-xs font-bold rounded-xl transition duration-300 ease-in-out shadow-sm cursor-pointer">
+                      View Details
+                    </button>
+                  </Link>
                 </div>
               </div>
             ))}
           </div>
-
         ) : (
-
           /* "NO DOCTORS FOUND" CONTAINER */
           <div className="max-w-xl mx-auto bg-white rounded-3xl border border-slate-200/50 p-10 text-center shadow-[0_4px_30px_rgba(0,0,0,0.015)] mt-12">
             <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto text-blue-600 mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-7 w-7"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                />
               </svg>
             </div>
-            
+
             <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
               No doctors found
             </h2>
             <p className="text-sm text-slate-400 leading-relaxed max-w-sm mx-auto mt-2.5">
-              We couldn&apos;t find any medical professionals matching your specific filters. Try adjusting your search criteria or resetting the filters.
+              We couldn&apos;t find any medical professionals matching your
+              specific filters. Try adjusting your search criteria or resetting
+              the filters.
             </p>
 
-            <button 
+            <button
               onClick={handleResetFilters}
               className="mt-6 px-5 py-2.5 bg-white border border-blue-200 hover:border-blue-300 text-blue-600 text-xs font-semibold rounded-xl inline-flex items-center gap-2 transition-all shadow-xs cursor-pointer hover:bg-blue-50/50"
             >
@@ -274,7 +305,6 @@ export default function AllAppointments() {
             </button>
           </div>
         )}
-
       </div>
     </section>
   );
