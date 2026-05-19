@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: "DocAppoint",
@@ -19,6 +20,7 @@ export default function RootLayout({
       lang="en"
     >
       <body>
+        <Navbar/>
         {children}
         </body>
     </html>
