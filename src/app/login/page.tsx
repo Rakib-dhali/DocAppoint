@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, Check } from 'lucide-react';
 import Link from 'next/link';
+import { authClient } from '@/lib/auth-client';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -20,10 +21,17 @@ export default function LoginPage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit  = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Logging in with:', formData);
-    // Add authentication logic here
+    const { email, password } = formData;
+    const { data, error } = await authClient.signIn.email({
+    email,
+    password, 
+});
+    if (error) {
+      console.log('Error logging in:', error);
+    }
+    console.log('Logged in:', data);
   };
 
   return (
