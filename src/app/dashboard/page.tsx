@@ -190,7 +190,7 @@ export default function MyBookingsDashboard({ initialAppointments = [] }: Merged
 
     setLoading(true);
     try {
-      const res = await fetch(`${BACKEND_URL}/appointments/${selectedAppointment._id}`, { 
+      const res = await fetch(`${BACKEND_URL}/api/appointments/${selectedAppointment._id}`, { 
         method: "DELETE" 
       });
 
