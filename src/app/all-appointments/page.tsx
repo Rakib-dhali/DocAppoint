@@ -118,7 +118,7 @@ export default function AllAppointments() {
 
   return (
     <section className="min-h-screen bg-[#f3f8ff] py-16 px-6 sm:px-12 lg:px-24">
-      <div className="max-w-7xl mx-auto w-full">
+      <div className="max-w-350 mx-auto w-full">
         {/* ================= HEADER SECTION ================= */}
         <div className="text-center max-w-2xl mx-auto mb-12">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">

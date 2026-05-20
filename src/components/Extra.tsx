@@ -54,7 +54,7 @@ export default function ExtraSection() {
   ];
 
   return (
-    <div className="w-full bg-slate-50/50 font-sans antialiased selection:bg-blue-500/10 max-w-7xl mx-auto px-6 md:px-12 lg:px-18 xl:px-24 mt-15">
+    <div className="w-full bg-slate-50/50 font-sans antialiased selection:bg-blue-500/10 max-w-350 mx-auto px-6 md:px-12 lg:px-18 xl:px-24 mt-15">
       
       
       <section className="bg-white py-16">

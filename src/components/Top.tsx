@@ -37,8 +37,8 @@ export default function TopRatedDoctors() {
   }, []);
 
   return (
-    <section className="w-full bg-white mx-auto max-w-7xl px-6 md:px-12 lg:px-18 xl:px-24 mt-20">
-      <div className="mx-auto max-w-7xl">
+    <section className="w-full bg-white mx-auto max-w-350 px-6 md:px-12 lg:px-18 xl:px-24 mt-20">
+      <div className="mx-auto max-w-350">
         {/* Heading */}
         <div className="mb-8 flex items-center gap-2">
           <h2 className="text-2xl font-bold text-[#1d1d1f] md:text-3xl text-center">

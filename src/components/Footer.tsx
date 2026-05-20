@@ -7,7 +7,7 @@ export default function Footer() {
   return (
     <footer className="bg-[#111827] text-slate-400 text-sm font-sans antialiased">
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-6 sm:px-12 lg:px-24 py-16 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 lg:gap-16">
+      <div className="max-w-350 mx-auto px-6 sm:px-12 lg:px-24 py-16 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 lg:gap-16">
         
         {/* Column 1: Brand Profile & Socials */}
         <div className="md:col-span-4 space-y-5">
