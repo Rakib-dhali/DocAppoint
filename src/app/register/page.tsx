@@ -62,6 +62,15 @@ export default function RegisterPage() {
     }
     console.log("Signed up:", data);
   };
+   const googleSignUp = async () => {
+    const { error } = await authClient.signIn.social({
+      provider: "google",
+    });
+    if (error) {
+      alert(error.message!);
+      return;
+    }
+  };
 
   // Helper utility to control strength UI variables dynamically
   const getStrengthMeta = () => {
@@ -320,7 +329,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Google Social OAuth Button */}
-          <button
+          <button onClick={googleSignUp}
             type="button"
             className="w-full border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2.5 transition-all text-sm shadow-sm"
           >
