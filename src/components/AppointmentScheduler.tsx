@@ -7,7 +7,8 @@ interface SchedulerProps {
   availability: string[];
   fee: number;
   doctorId: string;
-  doctorName?: string; // Passed optionally from server to populate modal header
+  doctorName?: string; 
+  doctorImage?:string;// Passed optionally from server to populate modal header
   clinicLocation?: string;
   clinicName?: string; // Passed optionally from server to populate modal header
 }
@@ -17,6 +18,7 @@ export default function AppointmentScheduler({
   fee,
   doctorId,
   doctorName,
+  doctorImage,
   clinicName,
   clinicLocation,
 }: SchedulerProps) {
@@ -28,7 +30,7 @@ export default function AppointmentScheduler({
 
   // Modal form input states
   const [patientName, setPatientName] = useState<string>("");
-  const [patientEmail, setPatientEmail] = useState<string>("");
+  const [patientEmail, setPatientEmail] = useState<string>("rakib@gmail.com");
   const [gender, setGender] = useState<string>("Male");
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [appointmentDate, setAppointmentDate] = useState<string>("");
@@ -39,6 +41,9 @@ export default function AppointmentScheduler({
     const bookingData = {
       doctorId,
       doctorName,
+      doctorImage,
+      clinicLocation,
+      clinicName,
       patientName,
       patientEmail,
       gender,
@@ -75,7 +80,6 @@ export default function AppointmentScheduler({
 
       // 3. Reset form states cleanly on successful submission
       setPatientName("");
-      setPatientEmail("");
       setPhoneNumber("");
       setAppointmentDate("");
 
@@ -223,12 +227,13 @@ export default function AppointmentScheduler({
                   Email Address
                 </label>
                 <input
+                readOnly
                   type="email"
                   required
                   placeholder="Enter your email address"
                   value={patientEmail}
                   onChange={(e) => setPatientEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm placeholder-slate-400 focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all text-slate-800"
+                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm placeholder-slate-300 focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all text-slate-800"
                 />
               </div>
 

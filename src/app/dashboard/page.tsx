@@ -13,6 +13,7 @@ import {
   Edit2,
   Camera
 } from "lucide-react";
+import Image from "next/image";
 
 // Change this configuration string if your Express backend runs on another port
 const BACKEND_URL = "http://localhost:4000";
@@ -22,6 +23,7 @@ export interface Appointment {
   _id: string;
   doctorId: string;
   doctorName: string; 
+  doctorImage: string;
   clinicLocation: string;
   clinicName: string;
   patientName: string;
@@ -63,23 +65,30 @@ export default function MyBookingsDashboard({ initialAppointments = [] }: Merged
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
-  // 5. Temporary Mutation Form States
+  // 5. Temporary Mutation Form States (Profile)
   const [profileForm, setProfileForm] = useState<UserProfile>({ ...userProfile });
-  const [editDate, setEditDate] = useState<string>("");
-  const [editTime, setEditTime] = useState<string>("");
+  
+  // 6. Detailed Appointment Form States
+  const [patientName, setPatientName] = useState<string>("");
+  const [patientEmail, setPatientEmail] = useState<string>("");
+  const [gender, setGender] = useState<string>("Male");
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [appointmentDate, setAppointmentDate] = useState<string>("");
+  const [selectedSlot, setSelectedSlot] = useState<string>("");
+  
+  // Static availability slots array mock for form options
+  const availability = ["09:00 AM", "10:30 AM", "01:00 PM", "03:30 PM", "06:00 PM"];
 
   // ================= FETCH APPOINTMENTS DATA LAYER =================
   useEffect(() => {
     const fetchAppointments = async () => {
       setFetching(true);
       try {
-        // Connected to: GET api/appointments/:emailId
         const res = await fetch(`${BACKEND_URL}/api/appointments/${userProfile.email}`);
         if (!res.ok) {
           throw new Error("Failed to pull appointment data records from database server.");
         }
         const data = await res.json();
-        console.log(data);
         setAppointments(data);
       } catch (err) {
         console.error("Error fetching patient appointments:", err);
@@ -102,19 +111,7 @@ export default function MyBookingsDashboard({ initialAppointments = [] }: Merged
   const executeProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      // Opted for local synchronization update context wrapper
-      // If you eventually implement a profile collection backend endpoint, uncomment below:
-      /*
-      const res = await fetch(`${BACKEND_URL}/api/user/update`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profileForm)
-      });
-      if (!res.ok) throw new Error("Profile update sync failed");
-      */
-      
       setUserProfile({ ...profileForm });
       setIsProfileModalOpen(false);
     } catch (err) {
@@ -127,8 +124,15 @@ export default function MyBookingsDashboard({ initialAppointments = [] }: Merged
   // ================= APPOINTMENTS OPERATIONS HANDLERS =================
   const handleOpenUpdate = (appointment: Appointment) => {
     setSelectedAppointment(appointment);
-    setEditDate(appointment.appointmentDate || "");
-    setEditTime(appointment.appointmentTime || "");
+    
+    // Prefilling form states with existing appointment details
+    setPatientName(appointment.patientName || "");
+    setPatientEmail(appointment.patientEmail || "");
+    setGender(appointment.gender || "Male");
+    setPhoneNumber(appointment.phoneNumber || "");
+    setAppointmentDate(appointment.appointmentDate || "");
+    setSelectedSlot(appointment.appointmentTime || "");
+    
     setIsUpdateModalOpen(true);
   };
 
@@ -142,26 +146,35 @@ export default function MyBookingsDashboard({ initialAppointments = [] }: Merged
     if (!selectedAppointment) return;
 
     setLoading(true);
+    
+    const updatedPayload = {
+      patientName,
+      gender,
+      phoneNumber,
+      appointmentDate,
+      appointmentTime: selectedSlot
+    };
+
     try {
-      // Connected to: PATCH /appointments/:id
-      const res = await fetch(`${BACKEND_URL}/appointments/${selectedAppointment._id}`, {
+      const res = await fetch(`${BACKEND_URL}/api/appointments/${selectedAppointment._id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ appointmentDate: editDate, appointmentTime: editTime })
+        body: JSON.stringify(updatedPayload)
       });
 
       if (!res.ok) {
         throw new Error("Could not patch update data parameters to destination database server.");
       }
 
-      // Sync local component UI display arrays immediately upon success
+      // Sync updated data directly inside local state UI context
       setAppointments((prev) =>
         prev.map((item) =>
           item._id === selectedAppointment._id
-            ? { ...item, appointmentDate: editDate, appointmentTime: editTime }
+            ? { ...item, ...updatedPayload }
             : item
         )
       );
+      
       setIsUpdateModalOpen(false);
       setSelectedAppointment(null);
     } catch (err) {
@@ -177,7 +190,6 @@ export default function MyBookingsDashboard({ initialAppointments = [] }: Merged
 
     setLoading(true);
     try {
-      // Connected to: DELETE /appointments/:id
       const res = await fetch(`${BACKEND_URL}/appointments/${selectedAppointment._id}`, { 
         method: "DELETE" 
       });
@@ -186,7 +198,6 @@ export default function MyBookingsDashboard({ initialAppointments = [] }: Merged
         throw new Error("Could not perform removal sequence execution on server targets.");
       }
 
-      // Filter out item safely from state engine array mapping layers
       setAppointments((prev) => prev.filter((item) => item._id !== selectedAppointment._id));
       setIsDeleteModalOpen(false);
       setSelectedAppointment(null);
@@ -208,7 +219,6 @@ export default function MyBookingsDashboard({ initialAppointments = [] }: Merged
             <span className="text-xl font-black text-[#004ee6] tracking-tight">DocAppoint</span>
           </div>
 
-          {/* User Account Frame Section */}
           <div className="px-6 py-4 flex items-center gap-3 mb-4 group relative">
             <div className="relative">
               <img 
@@ -262,7 +272,6 @@ export default function MyBookingsDashboard({ initialAppointments = [] }: Merged
             </span>
           </div>
           
-          {/* Mobile Profile Trigger Shortcut Avatar */}
           <button 
             onClick={handleOpenProfileUpdate}
             className="md:hidden w-9 h-9 rounded-full overflow-hidden border border-slate-200 cursor-pointer"
@@ -271,7 +280,6 @@ export default function MyBookingsDashboard({ initialAppointments = [] }: Merged
           </button>
         </header>
 
-        {/* Content Body Container */}
         <div className="p-6 md:p-10 flex-1 flex flex-col justify-between max-w-4xl w-full mx-auto space-y-6">
           <div className="space-y-4">
             {fetching ? (
@@ -287,10 +295,8 @@ export default function MyBookingsDashboard({ initialAppointments = [] }: Merged
                   className="bg-white border border-slate-100 rounded-3xl p-5 md:p-6 flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between shadow-[0_8px_30px_rgb(0,0,0,0.01)]"
                 >
                   <div className="flex flex-col md:flex-row gap-4 w-full sm:w-auto">
-                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-blue-50 text-[#004ee6] font-black flex items-center justify-center border border-blue-100 shrink-0 text-xl">
-                      🩺
-                    </div>
-
+                    <Image height={80} width={80} src={appointment.doctorImage} alt={appointment.doctorName} className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-blue-50 text-[#004ee6] font-black flex items-center justify-center border border-blue-100 shrink-0 text-xl" />
+                    
                     <div className="space-y-2.5 flex-1 min-w-0">
                       <div>
                         <span className="bg-blue-50 text-[#004ee6] text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-md border border-blue-100 uppercase inline-block mb-1">
@@ -319,7 +325,6 @@ export default function MyBookingsDashboard({ initialAppointments = [] }: Merged
                     </div>
                   </div>
 
-                  {/* Actions Buttons */}
                   <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-0 border-slate-50 shrink-0">
                     <button 
                       type="button"
@@ -371,11 +376,9 @@ export default function MyBookingsDashboard({ initialAppointments = [] }: Merged
               <button onClick={() => setIsProfileModalOpen(false)} className="text-slate-400 p-1 hover:bg-slate-50 rounded-full cursor-pointer"><X className="w-4 h-4" /></button>
             </div>
             <form onSubmit={executeProfileUpdate} className="p-6 space-y-4">
-              
-              {/* Photo Input URL with Avatar preview */}
               <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                 <div className="w-14 h-14 rounded-full overflow-hidden bg-slate-200 border relative group shrink-0">
-                  <img src={profileForm.photoUrl || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde"} className="w-full h-full object-cover" alt="Avatar input context preview" />
+                  <img src={profileForm.photoUrl || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde"} className="w-full h-full object-cover" alt="Avatar preview" />
                   <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><Camera className="w-4 h-4 text-white" /></div>
                 </div>
                 <div className="space-y-1 w-full">
@@ -422,24 +425,181 @@ export default function MyBookingsDashboard({ initialAppointments = [] }: Merged
         </div>
       )}
 
-      {/* ================= RESCHEDULE UPDATE MODAL ================= */}
+      {/* ================= MODERNIZED PREFILLED RESCHEDULE MODAL ================= */}
       {isUpdateModalOpen && selectedAppointment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
           <div className="absolute inset-0" onClick={() => !loading && setIsUpdateModalOpen(false)} />
-          <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl relative z-10 overflow-hidden p-6 space-y-4 border border-slate-100">
-            <h3 className="font-bold text-slate-900 text-base">Reschedule Session</h3>
-            <form onSubmit={executeUpdateAction} className="space-y-4">
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-400 uppercase block">New Date</label>
-                <input type="date" required value={editDate} onChange={(e) => setEditDate(e.target.value)} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-700 font-medium focus:outline-hidden"/>
+          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl relative z-10 overflow-hidden border border-slate-100 flex flex-col">
+            
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="font-bold text-slate-900 text-base">Modify Appointment Details</h3>
+              <button 
+                onClick={() => setIsUpdateModalOpen(false)} 
+                className="text-slate-400 p-1 hover:bg-slate-50 rounded-full cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Injected Detailed Custom Form Layout */}
+            <form
+              onSubmit={executeUpdateAction}
+              className="p-6 space-y-5 text-left overflow-y-auto max-h-[80vh]"
+            >
+              {/* Assigned Doctor (Read Only Layout Look) */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Assigned Doctor
+                </label>
+                <div className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-700 text-sm font-semibold flex items-center gap-2.5">
+                  <div className="w-5 h-5 rounded-md bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+                    <span className="text-[10px] font-bold">🩺</span>
+                  </div>
+                  {selectedAppointment.doctorName}
+                </div>
               </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-400 uppercase block">New Time</label>
-                <input type="text" required placeholder="e.g. 10:30 AM" value={editTime} onChange={(e) => setEditTime(e.target.value)} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-700 font-medium focus:outline-hidden"/>
+
+              {/* Clinic Name (Read Only Layout Look) */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Clinic Name
+                </label>
+                <div className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-600 text-sm font-medium flex items-center gap-2.5">
+                  <span className="text-blue-500 text-sm shrink-0">🏥</span>
+                  <span className="truncate">{selectedAppointment.clinicName}</span>
+                </div>
               </div>
-              <div className="flex gap-3 pt-2">
-                <button type="button" disabled={loading} onClick={() => setIsUpdateModalOpen(false)} className="flex-1 py-2.5 bg-slate-50 text-slate-500 font-bold text-xs rounded-xl">Cancel</button>
-                <button type="submit" disabled={loading} className="flex-1 py-2.5 bg-[#004ee6] text-white font-bold text-xs rounded-xl disabled:opacity-50">{loading ? "Saving..." : "Save Changes"}</button>
+
+              {/* Clinic Location (Read Only Layout Look) */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Clinic Location
+                </label>
+                <div className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-600 text-sm font-medium flex items-center gap-2.5">
+                  <span className="text-blue-500 text-sm shrink-0">📍</span>
+                  <span className="truncate">{selectedAppointment.clinicLocation}</span>
+                </div>
+              </div>
+
+              {/* Patient Full Name Input */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Patient Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Enter your full name"
+                  value={patientName}
+                  onChange={(e) => setPatientName(e.target.value)}
+                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm placeholder-slate-400 focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all text-slate-800"
+                />
+              </div>
+
+              {/* Email Address Input */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Email Address
+                </label>
+                <input
+                  readOnly
+                  type="email"
+                  required
+                  placeholder="Enter your email address"
+                  value={patientEmail}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm text-slate-500 cursor-not-allowed focus:outline-hidden"
+                />
+              </div>
+
+              {/* Row Grid: Gender & Phone Number */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                    Gender
+                  </label>
+                  <select
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all text-slate-700 font-medium appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_16px_center] bg-no-repeat"
+                  >
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="+880 1XXX-XXXXXX"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm placeholder-slate-400 focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all text-slate-800"
+                  />
+                </div>
+              </div>
+
+              {/* Select Date Input */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Select Date
+                </label>
+                <input
+                  type="date"
+                  required
+                  value={appointmentDate}
+                  onChange={(e) => setAppointmentDate(e.target.value)}
+                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all text-slate-700 font-medium"
+                />
+              </div>
+
+              {/* Dynamic Available Time Slots Row inside Form */}
+              <div className="space-y-2.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Available Time Slots
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {availability.map((slot, idx) => {
+                    const isFormActive = selectedSlot === slot;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setSelectedSlot(slot)}
+                        className={`py-2 px-4 rounded-full text-xs font-bold transition-all border ${
+                          isFormActive
+                            ? "bg-[#004ee6] border-[#004ee6] text-white shadow-xs"
+                            : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                        }`}
+                      >
+                        {slot}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Modal Footer / Confirmation Trigger Button */}
+              <div className="pt-2 space-y-3">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 bg-gradient-to-r from-[#2563eb] to-[#38bdf8] hover:from-[#1d4ed8] hover:to-[#0ea5e9] text-white font-bold text-sm rounded-xl tracking-wide transition-all shadow-md active:scale-[0.99] cursor-pointer text-center disabled:opacity-50"
+                >
+                  {loading ? "Saving Changes..." : "Confirm Booking"}
+                </button>
+                <p className="text-[10px] text-slate-400 text-center leading-relaxed max-w-xs mx-auto">
+                  By confirming, you agree to our{" "}
+                  <a href="#" className="text-blue-500 hover:underline font-medium">
+                    Terms of Service
+                  </a>
+                  .
+                </p>
               </div>
             </form>
           </div>

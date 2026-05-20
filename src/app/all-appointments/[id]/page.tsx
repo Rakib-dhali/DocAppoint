@@ -96,6 +96,7 @@ export default async function DoctorProfilePage({ params }: PageProps) {
             {/* Passing only interactive dynamic items downstream to Client layer */}
             <AppointmentScheduler 
               doctorName={doctorData.name}
+              doctorImage={doctorData.image}
               clinicLocation={doctorData.location}
               clinicName={doctorData.hospital}
               availability={doctorData.availability} 
