@@ -1,4 +1,3 @@
-// app/providers/LenisProvider.tsx
 "use client";
 import { useEffect } from "react";
 import Lenis from "lenis";

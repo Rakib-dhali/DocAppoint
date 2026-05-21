@@ -14,6 +14,7 @@ import {
   Camera
 } from "lucide-react";
 import Image from "next/image";
+import { authClient } from "@/lib/auth-client";
 
 // Change this configuration string if your Express backend runs on another port
 const BACKEND_URL = "http://localhost:4000";
@@ -35,8 +36,8 @@ export interface Appointment {
 }
 
 interface UserProfile {
-  name: string;
-  email: string;
+  name?: string;
+  email?: string;
   photoUrl: string;
 }
 
@@ -45,65 +46,98 @@ interface MergedDashboardProps {
 }
 
 export default function MyBookingsDashboard({ initialAppointments = [] }: MergedDashboardProps) {
-  // 1. User Profile Global State
-  const [userProfile, setUserProfile] = useState<UserProfile>({
-    name: "Alex Johnson",
-    email: "rakib@gmail.com",
-    photoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
-  });
 
-  // 2. Appointments State Layer
-  const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
-  
-  // 3. Status Handling States
-  const [loading, setLoading] = useState<boolean>(false);
-  const [fetching, setFetching] = useState<boolean>(true);
-  
-  // 4. Modal Visibility Toggles
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+const { data: session } = authClient.useSession();
 
-  // 5. Temporary Mutation Form States (Profile)
-  const [profileForm, setProfileForm] = useState<UserProfile>({ ...userProfile });
-  
-  // 6. Detailed Appointment Form States
-  const [patientName, setPatientName] = useState<string>("");
-  const [patientEmail, setPatientEmail] = useState<string>("");
-  const [gender, setGender] = useState<string>("Male");
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
-  const [appointmentDate, setAppointmentDate] = useState<string>("");
-  const [selectedSlot, setSelectedSlot] = useState<string>("");
-  
-  // Static availability slots array mock for form options
-  const availability = ["09:00 AM", "10:30 AM", "01:00 PM", "03:30 PM", "06:00 PM"];
+// ================= COMPUTE USER PROFILE FROM SESSION =================
+// Instead of an extra state + useEffect cascade, compute directly from the active session hook.
+const userProfile: UserProfile = {
+  name: session?.user?.name || "",
+  email: session?.user?.email || "",
+  photoUrl: session?.user?.image || "/man.png",
+};
 
-  // ================= FETCH APPOINTMENTS DATA LAYER =================
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      setFetching(true);
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/appointments/${userProfile.email}`);
-        if (!res.ok) {
-          throw new Error("Failed to pull appointment data records from database server.");
-        }
-        const data = await res.json();
-        setAppointments(data);
-      } catch (err) {
-        console.error("Error fetching patient appointments:", err);
-      } finally {
-        setFetching(false);
-      }
-    };
+// 1. Appointments State Layer
+const [appointments, setAppointments] =
+  useState<Appointment[]>(initialAppointments);
 
-    if (userProfile.email) {
-      fetchAppointments();
+// 2. Status Handling States
+const [loading, setLoading] = useState<boolean>(false);
+const [fetching, setFetching] = useState<boolean>(true);
+
+// 3. Modal Visibility Toggles
+const [isProfileModalOpen, setIsProfileModalOpen] =
+  useState<boolean>(false);
+const [isUpdateModalOpen, setIsUpdateModalOpen] =
+  useState<boolean>(false);
+const [isDeleteModalOpen, setIsDeleteModalOpen] =
+  useState<boolean>(false);
+const [selectedAppointment, setSelectedAppointment] =
+  useState<Appointment | null>(null);
+
+// 4. Temporary Mutation Form States (Profile modal)
+const [profileForm, setProfileForm] = useState<UserProfile>({
+  name: "",
+  email: "",
+  photoUrl: "/man.png",
+});
+
+// 5. Detailed Appointment Form States
+const [patientName, setPatientName] = useState<string>("");
+const [patientEmail, setPatientEmail] = useState<string>("");
+const [gender, setGender] = useState<string>("Male");
+const [phoneNumber, setPhoneNumber] = useState<string>("");
+const [appointmentDate, setAppointmentDate] =
+  useState<string>("");
+const [selectedSlot, setSelectedSlot] =
+  useState<string>("");
+
+// Static availability slots array mock for form options
+const availability = [
+  "09:00 AM",
+  "10:30 AM",
+  "01:00 PM",
+  "03:30 PM",
+  "06:00 PM",
+];
+
+// ================= FETCH APPOINTMENTS DATA LAYER =================
+useEffect(() => {
+  const fetchAppointments = async () => {
+    if (!userProfile.email) {
+      setAppointments([]);
+      setFetching(false);
+      return;
     }
-  }, [userProfile.email]);
+
+    setFetching(true);
+
+    try {
+      const res = await fetch(
+        `${BACKEND_URL}/api/appointments/${userProfile.email}`
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch appointments");
+      }
+
+      const data = await res.json();
+
+      setAppointments(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Error fetching appointments:", err);
+      setAppointments([]);
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  fetchAppointments();
+}, [userProfile.email]);
 
   // ================= PROFILES ROUTING OPERATIONS =================
   const handleOpenProfileUpdate = () => {
+    // Populate form snapshot with computed values when modal opens
     setProfileForm({ ...userProfile });
     setIsProfileModalOpen(true);
   };
@@ -112,10 +146,16 @@ export default function MyBookingsDashboard({ initialAppointments = [] }: Merged
     e.preventDefault();
     setLoading(true);
     try {
-      setUserProfile({ ...profileForm });
+      // Execute database update via authClient
+      await authClient.updateUser({
+        name: profileForm.name,
+        image: profileForm.photoUrl,
+      });
+
       setIsProfileModalOpen(false);
     } catch (err) {
       console.error("Error updating user profile layout:", err);
+      alert("Failed to update profile setting parameters.");
     } finally {
       setLoading(false);
     }
@@ -409,10 +449,10 @@ export default function MyBookingsDashboard({ initialAppointments = [] }: Merged
                 <label className="text-[10px] font-bold text-slate-400 uppercase block">Email Address</label>
                 <input 
                   type="email" 
-                  required
+                  disabled
+                  readOnly
                   value={profileForm.email} 
-                  onChange={(e) => setProfileForm({...profileForm, email: e.target.value})}
-                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-hidden text-slate-700 font-medium"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm text-slate-400 focus:outline-hidden font-medium cursor-not-allowed"
                 />
               </div>
 

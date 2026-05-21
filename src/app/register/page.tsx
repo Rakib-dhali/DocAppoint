@@ -13,6 +13,7 @@ import {
   Eye,
 } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import React, { useState } from "react";
 
 export default function RegisterPage() {
@@ -60,7 +61,7 @@ export default function RegisterPage() {
     if (error) {
       console.log("Error signing up:", error);
     }
-    console.log("Signed up:", data);
+    redirect("/login");
   };
    const googleSignUp = async () => {
     const { error } = await authClient.signIn.social({

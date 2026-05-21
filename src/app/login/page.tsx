@@ -27,6 +27,7 @@ export default function LoginPage() {
     const { data, error } = await authClient.signIn.email({
     email,
     password, 
+    callbackURL: "/"
 });
     if (error) {
       console.log('Error logging in:', error);
