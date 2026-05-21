@@ -35,6 +35,8 @@ export default function AppointmentScheduler({
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [appointmentDate, setAppointmentDate] = useState<string>("");
 
+
+
   const handleConfirmBooking = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -57,6 +59,7 @@ export default function AppointmentScheduler({
       // 1. Corrected the endpoint spelling from 'create-appintment' to 'create-appointment'
       const res = await fetch(`http://localhost:4000/api/create-appointment`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "content-type": "application/json",
         },
