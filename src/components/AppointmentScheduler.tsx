@@ -1,16 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Calendar, X } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 interface SchedulerProps {
   availability: string[];
   fee: number;
   doctorId: string;
   doctorName?: string; 
-  doctorImage?:string;// Passed optionally from server to populate modal header
+  doctorImage?: string;
   clinicLocation?: string;
-  clinicName?: string; // Passed optionally from server to populate modal header
+  clinicName?: string;
 }
 
 export default function AppointmentScheduler({
@@ -22,20 +23,34 @@ export default function AppointmentScheduler({
   clinicName,
   clinicLocation,
 }: SchedulerProps) {
+  const { data: session } = authClient.useSession();
+
   // Profile view states
-  const [selectedSlot, setSelectedSlot] = useState<string>(
-    availability[0] || "",
-  );
+  const [selectedSlot, setSelectedSlot] = useState<string>(availability[0] || "");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   // Modal form input states
   const [patientName, setPatientName] = useState<string>("");
-  const [patientEmail, setPatientEmail] = useState<string>("rakib@gmail.com");
   const [gender, setGender] = useState<string>("Male");
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [appointmentDate, setAppointmentDate] = useState<string>("");
 
+  const derivedPatientEmail = session?.user?.email || "";
 
+  // DUAL-LAYER SCROLL LOCK: Enforces rigid boundary contexts across both main nodes
+useEffect(() => {
+  if (isModalOpen) {
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden"; // ← add this
+  } else {
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = ""; // ← add this
+  }
+  return () => {
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = ""; // ← add this
+  };
+}, [isModalOpen]);
 
   const handleConfirmBooking = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +62,7 @@ export default function AppointmentScheduler({
       clinicLocation,
       clinicName,
       patientName,
-      patientEmail,
+      patientEmail: derivedPatientEmail,
       gender,
       phoneNumber,
       appointmentDate,
@@ -56,45 +71,35 @@ export default function AppointmentScheduler({
     };
 
     try {
-      // 1. Corrected the endpoint spelling from 'create-appintment' to 'create-appointment'
       const res = await fetch(`http://localhost:4000/api/create-appointment`, {
         method: "POST",
-        credentials: "include",
         headers: {
           "content-type": "application/json",
+          Authorization: `Bearer ${session?.session?.token}`
         },
         body: JSON.stringify(bookingData),
       });
 
-      // 2. Prevent JSON parsing crash if server returns HTML errors (404/500)
       if (!res.ok) {
         const errorText = await res.text();
         console.error("Server error response:", errorText);
-        alert(
-          "Failed to book appointment. Please try choosing another time slot.",
-        );
+        alert("Failed to book appointment. Please try choosing another time slot.");
         return;
       }
 
       const data = await res.json();
       console.log("Success Response from DB:", data);
-
       alert("Appointment successfully booked!");
 
-      // 3. Reset form states cleanly on successful submission
       setPatientName("");
       setPhoneNumber("");
       setAppointmentDate("");
+      setIsModalOpen(false); 
 
-      // 4. Close the modal window
-      setIsModalOpen(false);
     } catch (error) {
       console.error("Network or Client Error occurred:", error);
-      alert(
-        "Could not connect to the booking server. Please check your network connection.",
-      );
+      alert("Could not connect to the booking server. Please check your network connection.");
     }
-    setIsModalOpen(false); // Close modal on success
   };
 
   return (
@@ -142,7 +147,7 @@ export default function AppointmentScheduler({
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
-          className="w-full sm:w-auto px-8 py-3.5 bg-linear-to-r from-[#2563eb] to-[#38bdf8] hover:from-[#1d4ed8] hover:to-[#0ea5e9] text-white font-bold text-sm rounded-xl inline-flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.99] cursor-pointer"
+          className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#2563eb] to-[#38bdf8] hover:from-[#1d4ed8] hover:to-[#0ea5e9] text-white font-bold text-sm rounded-xl inline-flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.99] cursor-pointer"
         >
           <Calendar className="w-4 h-4" />
           Book Appointment
@@ -151,21 +156,21 @@ export default function AppointmentScheduler({
 
       {/* ================= MODAL DIALOG OVERLAY ================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 overflow-y-auto">
+        // FIXED: Added touch-none and overscroll-none behaviors on wrapper
+        <div className="fixed inset-0 z-50 overscroll-contain flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 overflow-auto">
           {/* Backdrop wrapper dismiss anchor */}
-          <div
-            className="absolute inset-0"
-            onClick={() => setIsModalOpen(false)}
-          />
+          <div className="absolute inset-0" onClick={() => setIsModalOpen(false)} />
 
           {/* Form Modal Frame Container */}
-          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl relative z-10 overflow-hidden border border-slate-100 flex flex-col my-auto">
+          <div className="bg-white w-full max-w-md h-[80vh] rounded-3xl shadow-2xl relative z-10 overflow-hidden border border-slate-100 flex flex-col pointer-events-auto">
+            
             {/* Modal Header */}
-            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between shrink-0">
               <h3 className="text-xl font-bold text-slate-900 tracking-tight">
                 Book Appointment
               </h3>
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
                 className="text-slate-400 hover:text-slate-600 p-1.5 hover:bg-slate-50 rounded-full transition-colors cursor-pointer"
               >
@@ -174,11 +179,15 @@ export default function AppointmentScheduler({
             </div>
 
             {/* Modal Scrollable Body */}
+            {/* FIXED: Added 'overscroll-contain' to intercept and drop background bounce chaining */}
             <form
               onSubmit={handleConfirmBooking}
-              className="p-6 space-y-5 text-left overflow-y-auto max-h-[80vh]"
+              onWheel={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+              style={{ WebkitOverflowScrolling: "touch" }}
+              className="p-6 space-y-5 text-left overflow-y-auto flex-1 min-h-0"
             >
-              {/* Assigned Doctor (Read Only Layout Look) */}
+              {/* Assigned Doctor */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                   Assigned Doctor
@@ -191,7 +200,7 @@ export default function AppointmentScheduler({
                 </div>
               </div>
 
-              {/* Clinic Location (Read Only Layout Look) */}
+              {/* Clinic Name */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                   Clinic Name
@@ -201,6 +210,8 @@ export default function AppointmentScheduler({
                   <span className="truncate">{clinicName}</span>
                 </div>
               </div>
+
+              {/* Clinic Location */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                   Clinic Location
@@ -225,18 +236,19 @@ export default function AppointmentScheduler({
                   className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm placeholder-slate-400 focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all text-slate-800"
                 />
               </div>
+
+              {/* Email Address */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                   Email Address
                 </label>
                 <input
-                readOnly
+                  readOnly
                   type="email"
                   required
-                  placeholder="Enter your email address"
-                  value={patientEmail}
-                  onChange={(e) => setPatientEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm placeholder-slate-300 focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all text-slate-800"
+                  placeholder="No authenticated email found"
+                  value={derivedPatientEmail}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-500 cursor-not-allowed outline-hidden"
                 />
               </div>
 
@@ -312,8 +324,8 @@ export default function AppointmentScheduler({
                 </div>
               </div>
 
-              {/* Modal Footer / Confirmation Trigger Button */}
-              <div className="pt-2 space-y-3">
+              {/* Modal Footer Buttons */}
+              <div className="pt-2 space-y-3 shrink-0">
                 <button
                   type="submit"
                   className="w-full py-3.5 bg-gradient-to-r from-[#2563eb] to-[#38bdf8] hover:from-[#1d4ed8] hover:to-[#0ea5e9] text-white font-bold text-sm rounded-xl tracking-wide transition-all shadow-md active:scale-[0.99] cursor-pointer text-center"
@@ -322,10 +334,7 @@ export default function AppointmentScheduler({
                 </button>
                 <p className="text-[10px] text-slate-400 text-center leading-relaxed max-w-xs mx-auto">
                   By confirming, you agree to our{" "}
-                  <a
-                    href="/terms"
-                    className="text-blue-500 hover:underline font-medium"
-                  >
+                  <a href="/terms" className="text-blue-500 hover:underline font-medium">
                     Terms of Service
                   </a>
                   .

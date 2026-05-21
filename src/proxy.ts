@@ -11,11 +11,9 @@ export async function proxy(request: NextRequest) {
   if (!session) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
-  return NextResponse.redirect(new URL("/home", request.url));
-}
 
-// Alternatively, you can use a default export:
-// export default function proxy(request: NextRequest) { ... }
+  return NextResponse.next(); // ✅ was missing before
+}
 
 export const config = {
   matcher: ["/dashboard", "/dashboard/:path*"],

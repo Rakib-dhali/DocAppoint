@@ -73,20 +73,16 @@ export default function AllAppointmentsContent() {
   };
 
   // 2. Debounce the local typing input before updating the URL
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (localSearch !== currentQuery) {
-        updateSearchParam("query", localSearch);
-      }
-    }, 300); // Wait 300ms after the user stops typing
+useEffect(() => {
+  const delayDebounceFn = setTimeout(() => {
+    if (localSearch !== currentQuery) {
+      updateSearchParam("query", localSearch);
+    }
+  }, 300);
 
-    return () => clearTimeout(delayDebounceFn);
-  }, [localSearch, currentQuery]);
+  return () => clearTimeout(delayDebounceFn);
+}, [localSearch, currentQuery]); // ✅ add currentQuery here
 
-  // Sync local input state if URL changes externally (like on a Reset)
-  useEffect(() => {
-    setLocalSearch(currentQuery);
-  }, [currentQuery]);
 
   // Filter processing logic
   const filteredDoctors = doctors.filter((doctor: Doctor) => {
@@ -128,8 +124,8 @@ export default function AllAppointmentsContent() {
   };
 
   return (
-    <section className="min-h-screen bg-[#f3f8ff] py-16 px-6 sm:px-12 lg:px-24">
-      <div className="max-w-3xl mx-auto w-full">
+    <section className="min-h-screen bg-[#f3f8ff] py-5 px-6 sm:px-12 lg:px-18">
+      <div className="max-w-350 mx-auto w-full">
         {/* ================= HEADER SECTION ================= */}
         <div className="text-center max-w-2xl mx-auto mb-12">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">

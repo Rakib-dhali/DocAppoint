@@ -60,6 +60,7 @@ export default function RegisterPage() {
     });
     if (error) {
       console.log("Error signing up:", error);
+      return;
     }
     redirect("/login");
   };

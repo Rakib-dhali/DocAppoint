@@ -50,7 +50,7 @@ export default async function DoctorProfilePage({ params }: PageProps) {
   console.log(doctorData)
 
   return (
-    <div className="min-h-screen bg-[#f8faff] mx-auto max-w-350 px-6 md:px-12 lg:px-18 xl:px-24 py-10 md:py-15 lg:py-20 font-sans antialiased text-slate-800">
+    <div className="min-h-screen mx-auto max-w-350 px-6 md:px-12 lg:px-18 xl:px-24 py-10 md:py-15 lg:py-20 font-sans antialiased text-slate-800">
       <div className="space-y-8">
         
         {/* ================= STAGE 1: TOP PROFILE GRID ================= */}

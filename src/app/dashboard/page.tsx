@@ -112,13 +112,15 @@ useEffect(() => {
 
     setFetching(true);
 
-    try {
+      try {
       const res = await fetch(
         `${BACKEND_URL}/api/appointments/${userProfile.email}`
       );
 
       if (!res.ok) {
-        throw new Error("Failed to fetch appointments");
+        const text = await res.text().catch(() => "<no body>");
+        console.error("Appointments fetch failed:", res.status, text);
+        throw new Error(`Failed to fetch appointments: ${res.status}`);
       }
 
       const data = await res.json();
@@ -250,7 +252,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8faff] flex font-sans antialiased text-slate-800">
+    <div className="min-h-screen max-w-350 mx-auto  flex font-sans antialiased text-slate-800 py-5 px-6 sm:px-12 lg:px-18">
       
       {/* ================= LEFT SIDEBAR ================= */}
       <aside className="w-64 bg-white border-r border-slate-100 hidden md:flex flex-col justify-between shrink-0">
