@@ -66,12 +66,14 @@ const Navbar = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
           {!isLoggedIn && (
             <>
-              <button className="px-5  hidden md:block py-3 bg-white text-blue-600 font-semibold rounded-xl border border-blue-200 shadow-sm hover:bg-blue-50 hover:border-blue-300 transition-all duration-300">
-                <Link href="/register">Register</Link>
-              </button>
-              <button className="px-5 hidden md:flex py-3 bg-blue-600 text-white font-semibold rounded-xl  hover:bg-blue-700  transition-all duration-300  items-center justify-center gap-2 group">
-                <Link href="/login"></Link> Login
-              </button>
+            <Link href="/register" className="px-5  hidden md:block py-3 bg-white text-blue-600 font-semibold rounded-xl border border-blue-200 shadow-sm hover:bg-blue-50 hover:border-blue-300 transition-all duration-300">
+              <button className="">
+                Register
+              </button></Link>
+              <Link href="/login" className="px-5 hidden md:flex py-3 bg-blue-600 text-white font-semibold rounded-xl  hover:bg-blue-700  transition-all duration-300  items-center justify-center gap-2 ">
+              <button className="group">
+                Login
+              </button> </Link>
             </>
           )}
           {isLoggedIn && (

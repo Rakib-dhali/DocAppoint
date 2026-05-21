@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, X } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import toast, { Toaster } from "react-hot-toast"; // Added react-hot-toast imports
 
 interface SchedulerProps {
   availability: string[];
@@ -38,19 +39,39 @@ export default function AppointmentScheduler({
   const derivedPatientEmail = session?.user?.email || "";
 
   // DUAL-LAYER SCROLL LOCK: Enforces rigid boundary contexts across both main nodes
-useEffect(() => {
-  if (isModalOpen) {
-    document.body.style.overflow = "hidden";
-    document.documentElement.style.overflow = "hidden"; // ← add this
-  } else {
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = ""; // ← add this
-  }
-  return () => {
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = ""; // ← add this
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    };
+  }, [isModalOpen]);
+
+  // Handle the initial booking click safely check auth status
+  const handleOpenBookingModal = () => {
+    if (!session) {
+      toast.error("Only logged in users can book an appointment", {
+        duration: 4000,
+        position: "top-center",
+        style: {
+          fontSize: "13px",
+          fontWeight: "600",
+          borderRadius: "12px",
+          color: "#1e293b",
+          background: "#ffffff",
+          border: "1px solid #fee2e2"
+        },
+      });
+      return;
+    }
+    setIsModalOpen(true);
   };
-}, [isModalOpen]);
 
   const handleConfirmBooking = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,6 +125,9 @@ useEffect(() => {
 
   return (
     <>
+      {/* Toast container configuration provider mount */}
+      <Toaster />
+
       {/* Availability Slots Selector */}
       <div className="space-y-3">
         <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
@@ -146,7 +170,7 @@ useEffect(() => {
 
         <button
           type="button"
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleOpenBookingModal}
           className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#2563eb] to-[#38bdf8] hover:from-[#1d4ed8] hover:to-[#0ea5e9] text-white font-bold text-sm rounded-xl inline-flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.99] cursor-pointer"
         >
           <Calendar className="w-4 h-4" />
@@ -156,15 +180,11 @@ useEffect(() => {
 
       {/* ================= MODAL DIALOG OVERLAY ================= */}
       {isModalOpen && (
-        // FIXED: Added touch-none and overscroll-none behaviors on wrapper
         <div className="fixed inset-0 z-50 overscroll-contain flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 overflow-auto">
-          {/* Backdrop wrapper dismiss anchor */}
           <div className="absolute inset-0" onClick={() => setIsModalOpen(false)} />
 
-          {/* Form Modal Frame Container */}
           <div className="bg-white w-full max-w-md h-[80vh] rounded-3xl shadow-2xl relative z-10 overflow-hidden border border-slate-100 flex flex-col pointer-events-auto">
             
-            {/* Modal Header */}
             <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between shrink-0">
               <h3 className="text-xl font-bold text-slate-900 tracking-tight">
                 Book Appointment
@@ -178,8 +198,6 @@ useEffect(() => {
               </button>
             </div>
 
-            {/* Modal Scrollable Body */}
-            {/* FIXED: Added 'overscroll-contain' to intercept and drop background bounce chaining */}
             <form
               onSubmit={handleConfirmBooking}
               onWheel={(e) => e.stopPropagation()}
@@ -187,7 +205,6 @@ useEffect(() => {
               style={{ WebkitOverflowScrolling: "touch" }}
               className="p-6 space-y-5 text-left overflow-y-auto flex-1 min-h-0"
             >
-              {/* Assigned Doctor */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                   Assigned Doctor
@@ -200,7 +217,6 @@ useEffect(() => {
                 </div>
               </div>
 
-              {/* Clinic Name */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                   Clinic Name
@@ -211,7 +227,6 @@ useEffect(() => {
                 </div>
               </div>
 
-              {/* Clinic Location */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                   Clinic Location
@@ -222,7 +237,6 @@ useEffect(() => {
                 </div>
               </div>
 
-              {/* Patient Full Name Input */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                   Patient Full Name
@@ -237,7 +251,6 @@ useEffect(() => {
                 />
               </div>
 
-              {/* Email Address */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                   Email Address
@@ -252,7 +265,6 @@ useEffect(() => {
                 />
               </div>
 
-              {/* Row Grid: Gender & Phone Number */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
@@ -284,7 +296,6 @@ useEffect(() => {
                 </div>
               </div>
 
-              {/* Select Date Input */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                   Select Date
@@ -298,7 +309,6 @@ useEffect(() => {
                 />
               </div>
 
-              {/* Dynamic Available Time Slots Row inside Form */}
               <div className="space-y-2.5">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                   Available Time Slots
@@ -324,7 +334,6 @@ useEffect(() => {
                 </div>
               </div>
 
-              {/* Modal Footer Buttons */}
               <div className="pt-2 space-y-3 shrink-0">
                 <button
                   type="submit"

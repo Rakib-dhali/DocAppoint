@@ -3,7 +3,6 @@
 import { authClient } from "@/lib/auth-client";
 import {
   FileImage,
-  Image,
   Mail,
   User,
   Lock,
@@ -15,6 +14,7 @@ import {
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -59,9 +59,10 @@ export default function RegisterPage() {
       image:photoUrl,
     });
     if (error) {
-      console.log("Error signing up:", error);
+      toast.error(error.message!);
       return;
     }
+    toast.success("Account created successfully!");
     redirect("/login");
   };
    const googleSignUp = async () => {
@@ -69,7 +70,7 @@ export default function RegisterPage() {
       provider: "google",
     });
     if (error) {
-      alert(error.message!);
+      toast.error(error.message!);
       return;
     }
   };

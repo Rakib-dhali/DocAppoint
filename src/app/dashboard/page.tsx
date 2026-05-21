@@ -17,7 +17,7 @@ import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
 
 // Change this configuration string if your Express backend runs on another port
-const BACKEND_URL = "http://localhost:4000";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL 
 
 // ================= TYPES DEFINITION =================
 export interface Appointment {

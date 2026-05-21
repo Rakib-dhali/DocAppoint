@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, Check } from 'lucide-react';
 import Link from 'next/link';
 import { authClient } from '@/lib/auth-client';
+import toast from 'react-hot-toast';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -30,16 +31,18 @@ export default function LoginPage() {
     callbackURL: "/"
 });
     if (error) {
-      console.log('Error logging in:', error);
+      toast.error(error.message!);
     }
-    console.log('Logged in:', data);
+    if (data) {
+      toast.success("Logged in successfully!");
+    }
   };
  const googleSignIn = async () => {
     const { error } = await authClient.signIn.social({
       provider: "google",
     });
     if (error) {
-      alert(error.message!);
+      toast.error(error.message!);
       return;
     }
   };

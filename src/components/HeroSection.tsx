@@ -6,13 +6,14 @@ import { Autoplay, EffectFade } from 'swiper/modules';
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/effect-fade';
+import { redirect } from 'next/navigation';
 
 export default function HeroBanner() {
   // Sample data for the slider
   const doctors = [
     {
       id: 1,
-      name: "Dr. Ayesha",
+      name: "Dr. arron",
       role: "Cardiologist",
       slot: "4:00 PM",
       image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=600&q=80",
@@ -54,13 +55,13 @@ export default function HeroBanner() {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
-            <button className="px-8 py-3.5 bg-blue-600 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 flex items-center justify-center gap-2 group">
+            <button onClick={() => redirect("/all-appointment")} className="px-8 py-3.5 bg-blue-600 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 flex items-center justify-center gap-2 group">
               Book Appointment
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </button>
-            <button className="px-8 py-3.5 bg-white text-blue-600 font-semibold rounded-xl border border-blue-200 shadow-sm hover:bg-blue-50 hover:border-blue-300 transition-all duration-300">
+            <button onClick={() => redirect("/all-appointment")} className="px-8 py-3.5 bg-white text-blue-600 font-semibold rounded-xl border border-blue-200 shadow-sm hover:bg-blue-50 hover:border-blue-300 transition-all duration-300">
               Explore Doctors
             </button>
           </div>
@@ -83,7 +84,7 @@ export default function HeroBanner() {
         </div>
 
         {/* Right Slider Side */}
-        <div className="lg:col-span-6 relative w-full max-w-[500px] lg:max-w-none mx-auto aspect-square lg:aspect-auto lg:h-[550px] flex items-center justify-center">
+        <div className="lg:col-span-6 relative w-full max-w-125 lg:max-w-none mx-auto aspect-square lg:aspect-auto lg:h-[550px] flex items-center justify-center">
           
           {/* Main Swiper Container */}
           <div className="w-full h-[85%] rounded-3xl overflow-hidden shadow-2xl shadow-blue-900/10 border-4 border-white bg-white relative group">
