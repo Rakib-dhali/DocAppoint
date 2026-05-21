@@ -11,8 +11,8 @@ export default function Footer() {
         
         {/* Column 1: Brand Profile & Socials */}
         <div className="md:col-span-4 space-y-5">
-          <h3 className="text-xl font-bold text-white tracking-tight">
-            DocAppoint
+          <h3 className="text-2xl font-bold text-white tracking-tight">
+            Cliniqo
           </h3>
           <p className="text-slate-400 leading-relaxed text-sm max-w-sm">
             Simplifying healthcare access through technology. Connect with the right specialists instantly and manage your appointments with ease.
@@ -102,7 +102,7 @@ export default function Footer() {
 
       {/* Copyright Bottom Bar Area */}
       <div className="border-t border-slate-800/60 py-6 text-center text-xs text-slate-500 tracking-wide">
-        &copy; {currentYear} DocAppoint. All rights reserved.
+        &copy; {currentYear} Cliniqo. All rights reserved.
       </div>
     </footer>
   );

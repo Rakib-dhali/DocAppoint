@@ -26,7 +26,7 @@ export default function TopRatedDoctors() {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await fetch("http://localhost:4000/api/top-doctors");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/top-doctors`);
         const data = await response.json();
         setTopDoctors(data);
       } catch (error) {

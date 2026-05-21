@@ -32,7 +32,7 @@ interface PageProps {
 
 // Async Data Fetcher function
 async function getDoctorDetails(id: string): Promise<DoctorDetailsData> {
-  const res = await fetch(`http://localhost:4000/api/doctors/${id}`);
+  const res = await fetch(`${}/api/doctors/${id}`);
 
   if (!res.ok) {
     throw new Error("Failed to fetch doctor details profiles.");

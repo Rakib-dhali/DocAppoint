@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
+import toast from "react-hot-toast";
 
 // Change this configuration string if your Express backend runs on another port
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL 
@@ -149,10 +150,18 @@ useEffect(() => {
     setLoading(true);
     try {
       // Execute database update via authClient
-      await authClient.updateUser({
+      const {data, error} = await authClient.updateUser({
         name: profileForm.name,
         image: profileForm.photoUrl,
       });
+
+      if (error) {
+          toast.error(error.message!);
+          return;
+      }
+      if (data) {
+        toast.success("Profile updated successfully!");
+      }
 
       setIsProfileModalOpen(false);
     } catch (err) {
@@ -207,7 +216,7 @@ useEffect(() => {
       if (!res.ok) {
         throw new Error("Could not patch update data parameters to destination database server.");
       }
-
+      toast.success("Appointment updated successfully!");
       // Sync updated data directly inside local state UI context
       setAppointments((prev) =>
         prev.map((item) =>
@@ -216,6 +225,8 @@ useEffect(() => {
             : item
         )
       );
+
+
       
       setIsUpdateModalOpen(false);
       setSelectedAppointment(null);
@@ -239,7 +250,7 @@ useEffect(() => {
       if (!res.ok) {
         throw new Error("Could not perform removal sequence execution on server targets.");
       }
-
+      toast.success("Appointment deleted successfully!");
       setAppointments((prev) => prev.filter((item) => item._id !== selectedAppointment._id));
       setIsDeleteModalOpen(false);
       setSelectedAppointment(null);
@@ -257,9 +268,6 @@ useEffect(() => {
       {/* ================= LEFT SIDEBAR ================= */}
       <aside className="w-64 bg-white border-r border-slate-100 hidden md:flex flex-col justify-between shrink-0">
         <div>
-          <div className="px-6 py-6">
-            <span className="text-xl font-black text-[#004ee6] tracking-tight">DocAppoint</span>
-          </div>
 
           <div className="px-6 py-4 flex items-center gap-3 mb-4 group relative">
             <div className="relative">

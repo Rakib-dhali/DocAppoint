@@ -92,7 +92,7 @@ export default function AppointmentScheduler({
     };
 
     try {
-      const res = await fetch(`http://localhost:4000/api/create-appointment`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/create-appointment`, {
         method: "POST",
         headers: {
           "content-type": "application/json",
@@ -104,13 +104,12 @@ export default function AppointmentScheduler({
       if (!res.ok) {
         const errorText = await res.text();
         console.error("Server error response:", errorText);
-        alert("Failed to book appointment. Please try choosing another time slot.");
+        toast.error("Failed to book appointment. Please try choosing another time slot.");
         return;
       }
 
       const data = await res.json();
-      console.log("Success Response from DB:", data);
-      alert("Appointment successfully booked!");
+      toast.success("Appointment successfully booked!");
 
       setPatientName("");
       setPhoneNumber("");
@@ -125,8 +124,7 @@ export default function AppointmentScheduler({
 
   return (
     <>
-      {/* Toast container configuration provider mount */}
-      <Toaster />
+      
 
       {/* Availability Slots Selector */}
       <div className="space-y-3">

@@ -22,7 +22,7 @@ export default function RootLayout({
     <html
       lang="en"
     >
-      <body className="bg-[#f3f3f3]">
+      <body className="">
         <Navbar/>
         <LenisProvider>
         {children}</LenisProvider>
