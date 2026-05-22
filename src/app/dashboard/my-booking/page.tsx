@@ -106,9 +106,13 @@ export default function MyBookingsPage() {
     };
 
     try {
+      const { data } = await authClient.token();
       const res = await fetch(`${BACKEND_URL}/api/appointments/${selectedAppointment._id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+          headers: {
+            "content-type": "application/json",
+            authorization: `Bearer ${data?.token}`
+          },
         body: JSON.stringify(updatedPayload),
       });
 
@@ -130,8 +134,13 @@ export default function MyBookingsPage() {
     if (!selectedAppointment) return;
     setLoading(true);
     try {
+      const { data } = await authClient.token();
       const res = await fetch(`${BACKEND_URL}/api/appointments/${selectedAppointment._id}`, {
         method: "DELETE",
+        headers: {
+                "content-type": "application/json",
+                authorization: `Bearer ${data?.token}`
+            }
       });
       if (!res.ok) throw new Error("Deletion target path fault.");
       toast.success("Appointment deleted successfully!");
