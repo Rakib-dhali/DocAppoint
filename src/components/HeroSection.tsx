@@ -37,7 +37,7 @@ export default function HeroBanner() {
   return (
     <section className="relative min-h-[90vh] flex items-center  overflow-hidden mx-auto max-w-350 bg-white px-6 md:px-12 lg:px-18 xl:px-24">
       {/* Background Subtle Grid Pattern Accent */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px]"></div>
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#3b82f6_1px,transparent_1px)] bg-size-[16px_16px]"></div>
 
       <div className="max-w-350 mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center relative z-10">
         
