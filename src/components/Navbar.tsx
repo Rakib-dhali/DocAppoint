@@ -1,28 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { redirect, usePathname } from "next/navigation"; 
+import { redirect, usePathname } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "motion/react";
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useMotionValueEvent,
+} from "motion/react";
 
 const Navbar = () => {
   const { data: session } = authClient.useSession();
   const isLoggedIn = session?.user;
   const [menuOpen, setMenuOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const pathname = usePathname(); 
+  const pathname = usePathname();
 
   const { scrollY } = useScroll();
 
-  // Track the scroll position using motion hooks
-  useMotionValueEvent(scrollY, "change", (latest:number) => {
+  useMotionValueEvent(scrollY, "change", (latest: number) => {
     const previous = scrollY.getPrevious() ?? 0;
-    // Hide navbar when scrolling down past 150px, show when scrolling up
-    if (latest > previous && latest > 150) {
+    if (latest > previous && latest > 120) {
       setHidden(true);
-      setMenuOpen(false); // Auto-closes mobile menu if open while scrolling down
+      setMenuOpen(false);
     } else {
       setHidden(false);
     }
@@ -50,9 +53,7 @@ const Navbar = () => {
           }
         `}
       </style>
-      
-      {/* Fixed top container using motion variables */}
-      <motion.section 
+      <motion.section
         variants={{
           visible: { y: 0 },
           hidden: { y: "-100%" },
@@ -62,14 +63,17 @@ const Navbar = () => {
         className="w-full bg-white fixed top-0 left-0 right-0 z-50 border-b border-zinc-100 shadow-xs"
       >
         <nav className="mx-auto max-w-350 py-5 px-6 sm:px-12 lg:px-18 flex items-center justify-between relative">
-          <Link href="/" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
+          <Link
+            href="/"
+            className="flex items-center gap-2"
+            onClick={() => setMenuOpen(false)}
+          >
             <Image src={"/logo-c.png"} alt="logo" height={60} width={60} />
             <p className="text-blue-900 hidden lg:flex font-semibold text-3xl">
               Clini<span className="text-blue-600">qo</span>
             </p>
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center bg-zinc-50 border border-zinc-200 rounded-full px-1 py-1 gap-2">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
@@ -89,14 +93,19 @@ const Navbar = () => {
             })}
           </div>
 
-          {/* Desktop Get Started CTA Button */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             {!isLoggedIn && (
               <div className="hidden md:flex items-center gap-4">
-                <Link href="/register" className="px-5 py-3 bg-white text-blue-600 font-semibold rounded-xl border border-blue-200 shadow-sm hover:bg-blue-50 hover:border-blue-300 transition-all duration-300">
+                <Link
+                  href="/register"
+                  className="px-5 py-3 bg-white text-blue-600 font-semibold rounded-xl border border-blue-200 shadow-sm hover:bg-blue-50 hover:border-blue-300 transition-all duration-300"
+                >
                   Register
                 </Link>
-                <Link href="/login" className="px-5 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center justify-center gap-2">
+                <Link
+                  href="/login"
+                  className="px-5 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center justify-center gap-2"
+                >
                   Login
                 </Link>
               </div>
@@ -119,22 +128,26 @@ const Navbar = () => {
               </div>
             )}
 
-            {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="md:hidden flex flex-col gap-1.5 cursor-pointer bg-transparent border-0 p-1 z-50 relative"
               aria-label="Toggle Menu"
             >
-              <span className={`block w-6 h-0.5 bg-zinc-800 transition-transform duration-300 ${menuOpen ? "rotate-45 translate-y-2" : ""}`}></span>
-              <span className={`block w-6 h-0.5 bg-zinc-800 transition-opacity duration-300 ${menuOpen ? "opacity-0" : ""}`}></span>
-              <span className={`block w-6 h-0.5 bg-zinc-800 transition-transform duration-300 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`}></span>
+              <span
+                className={`block w-6 h-0.5 bg-zinc-800 transition-transform duration-300 ${menuOpen ? "rotate-45 translate-y-2" : ""}`}
+              ></span>
+              <span
+                className={`block w-6 h-0.5 bg-zinc-800 transition-opacity duration-300 ${menuOpen ? "opacity-0" : ""}`}
+              ></span>
+              <span
+                className={`block w-6 h-0.5 bg-zinc-800 transition-transform duration-300 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`}
+              ></span>
             </button>
           </div>
 
-          {/* Mobile Menu Panel with motion AnimatePresence */}
           <AnimatePresence>
             {menuOpen && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: -15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
@@ -158,20 +171,20 @@ const Navbar = () => {
                     </Link>
                   );
                 })}
-                
+
                 <div className="flex flex-col gap-4 pt-2">
                   {!isLoggedIn && (
                     <div className="flex flex-col gap-3">
-                      <Link 
-                        href="/register" 
-                        onClick={() => setMenuOpen(false)} // Closes menu panel when clicked
+                      <Link
+                        href="/register"
+                        onClick={() => setMenuOpen(false)}
                         className="px-5 text-center py-3 bg-white text-blue-600 font-semibold rounded-xl border border-blue-200 shadow-sm hover:bg-blue-50 hover:border-blue-300 transition-all duration-300"
                       >
                         Register
                       </Link>
-                      <Link 
-                        href="/login" 
-                        onClick={() => setMenuOpen(false)} // Closes menu panel when clicked
+                      <Link
+                        href="/login"
+                        onClick={() => setMenuOpen(false)}
                         className="px-5 text-center py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-300 block"
                       >
                         Login
@@ -192,9 +205,8 @@ const Navbar = () => {
           </AnimatePresence>
         </nav>
       </motion.section>
-      
-      {/* Layout offset spacer */}
-      <div className="h-[92px] w-full" />
+
+      <div className="h-23 w-full" />
     </>
   );
 };

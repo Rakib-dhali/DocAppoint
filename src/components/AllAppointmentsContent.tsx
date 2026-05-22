@@ -1,13 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Search,
-  Star,
-  Calendar,
-  RefreshCcw,
-  Briefcase,
-} from "lucide-react";
+import { Search, Star, Calendar, RefreshCcw, Briefcase } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
@@ -35,7 +29,6 @@ export default function AllAppointmentsContent() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // 1. Sync local search input with the initial URL param
   const currentQuery = searchParams.get("query") || "";
   const [localSearch, setLocalSearch] = useState<string>(currentQuery);
 
@@ -43,11 +36,12 @@ export default function AllAppointmentsContent() {
   const selectedFee = searchParams.get("fee") || "Any Price";
   const selectedExperience = searchParams.get("experience") || "Any Experience";
 
-  // Fetching data from API endpoint
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/doctors`);
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/doctors`,
+        );
         const data: Doctor[] = await response.json();
         setDoctors(data);
       } catch (error) {
@@ -59,32 +53,33 @@ export default function AllAppointmentsContent() {
     fetchDoctors();
   }, []);
 
-  // Central utility function to update the URL parameters dynamically
   const updateSearchParam = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    
-    if (!value || value === "Any Rating" || value === "Any Price" || value === "Any Experience") {
+
+    if (
+      !value ||
+      value === "Any Rating" ||
+      value === "Any Price" ||
+      value === "Any Experience"
+    ) {
       params.delete(key);
     } else {
       params.set(key, value);
     }
-    
+
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  // 2. Debounce the local typing input before updating the URL
-useEffect(() => {
-  const delayDebounceFn = setTimeout(() => {
-    if (localSearch !== currentQuery) {
-      updateSearchParam("query", localSearch);
-    }
-  }, 300);
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (localSearch !== currentQuery) {
+        updateSearchParam("query", localSearch);
+      }
+    }, 300);
 
-  return () => clearTimeout(delayDebounceFn);
-}, [localSearch, currentQuery]); // ✅ add currentQuery here
+    return () => clearTimeout(delayDebounceFn);
+  }, [localSearch, currentQuery]);
 
-
-  // Filter processing logic
   const filteredDoctors = doctors.filter((doctor: Doctor) => {
     const matchesSearch =
       doctor.name.toLowerCase().includes(localSearch.toLowerCase()) ||
@@ -126,7 +121,6 @@ useEffect(() => {
   return (
     <section className="min-h-screen bg-[#f3f8ff] py-5 px-6 sm:px-12 lg:px-18">
       <div className="max-w-350 mx-auto w-full">
-        {/* ================= HEADER SECTION ================= */}
         <div className="text-center max-w-2xl mx-auto mb-12">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Find Your Doctor
@@ -136,11 +130,8 @@ useEffect(() => {
             appointment in seconds with our transparent scheduling system.
           </p>
         </div>
-
-        {/* ================= SEARCH & FILTER CONTROL PANEL ================= */}
         <div className="bg-white rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.02)] border border-slate-200/60 p-4 sm:p-5 mb-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
-            {/* Input Search Box */}
             <div className="lg:col-span-6 space-y-2">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
                 Search By Name or Specialty
@@ -158,8 +149,6 @@ useEffect(() => {
                 />
               </div>
             </div>
-
-            {/* Dropdown 1: Rating Select */}
             <div className="lg:col-span-2 space-y-2">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
                 Rating
@@ -176,8 +165,6 @@ useEffect(() => {
                 <option>4.9+</option>
               </select>
             </div>
-
-            {/* Dropdown 2: Fee/Price Select */}
             <div className="lg:col-span-2 space-y-2">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
                 Fee
@@ -195,8 +182,6 @@ useEffect(() => {
                 <option>Above 1000</option>
               </select>
             </div>
-
-            {/* Dropdown 3: Experience Level Select */}
             <div className="lg:col-span-2 space-y-2">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
                 Experience
@@ -216,8 +201,6 @@ useEffect(() => {
             </div>
           </div>
         </div>
-
-        {/* ================= CONDITIONAL CONTENT VIEWS ================= */}
         {loading ? (
           <div className="flex justify-center items-center py-24">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
@@ -259,7 +242,8 @@ useEffect(() => {
                   </div>
 
                   <p className="text-xs text-slate-500 leading-relaxed mt-4 line-clamp-2">
-                    {doctor.description || `Specialized consulting at ${doctor.hospital}.`}
+                    {doctor.description ||
+                      `Specialized consulting at ${doctor.hospital}.`}
                   </p>
                 </div>
 
@@ -270,7 +254,8 @@ useEffect(() => {
                     </span>
                     <span className="text-xs font-bold text-slate-800 flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5 text-blue-500" />
-                      {doctor.availability?.[0]?.split(" - ")?.[0] || "Tomorrow, 9 AM"}
+                      {doctor.availability?.[0]?.split(" - ")?.[0] ||
+                        "Tomorrow, 9 AM"}
                     </span>
                   </div>
                   <Link href={`/all-appointments/${doctor._id}`}>

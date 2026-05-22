@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, X } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
-import toast, { Toaster } from "react-hot-toast"; // Added react-hot-toast imports
+import toast from "react-hot-toast";
 
 interface SchedulerProps {
   availability: string[];
   fee: number;
   doctorId: string;
-  doctorName?: string; 
+  doctorName?: string;
   doctorImage?: string;
   clinicLocation?: string;
   clinicName?: string;
@@ -26,11 +26,11 @@ export default function AppointmentScheduler({
 }: SchedulerProps) {
   const { data: session } = authClient.useSession();
 
-  // Profile view states
-  const [selectedSlot, setSelectedSlot] = useState<string>(availability[0] || "");
+  const [selectedSlot, setSelectedSlot] = useState<string>(
+    availability[0] || "",
+  );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  // Modal form input states
   const [patientName, setPatientName] = useState<string>("");
   const [gender, setGender] = useState<string>("Male");
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -38,7 +38,6 @@ export default function AppointmentScheduler({
 
   const derivedPatientEmail = session?.user?.email || "";
 
-  // DUAL-LAYER SCROLL LOCK: Enforces rigid boundary contexts across both main nodes
   useEffect(() => {
     if (isModalOpen) {
       document.body.style.overflow = "hidden";
@@ -53,7 +52,6 @@ export default function AppointmentScheduler({
     };
   }, [isModalOpen]);
 
-  // Handle the initial booking click safely check auth status
   const handleOpenBookingModal = () => {
     if (!session) {
       toast.error("Only logged in users can book an appointment", {
@@ -65,7 +63,7 @@ export default function AppointmentScheduler({
           borderRadius: "12px",
           color: "#1e293b",
           background: "#ffffff",
-          border: "1px solid #fee2e2"
+          border: "1px solid #fee2e2",
         },
       });
       return;
@@ -92,19 +90,24 @@ export default function AppointmentScheduler({
     };
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/create-appointment`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          Authorization: `Bearer ${session?.session?.token}`
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/create-appointment`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            Authorization: `Bearer ${session?.session?.token}`,
+          },
+          body: JSON.stringify(bookingData),
         },
-        body: JSON.stringify(bookingData),
-      });
+      );
 
       if (!res.ok) {
         const errorText = await res.text();
         console.error("Server error response:", errorText);
-        toast.error("Failed to book appointment. Please try choosing another time slot.");
+        toast.error(
+          "Failed to book appointment. Please try choosing another time slot.",
+        );
         return;
       }
 
@@ -114,19 +117,17 @@ export default function AppointmentScheduler({
       setPatientName("");
       setPhoneNumber("");
       setAppointmentDate("");
-      setIsModalOpen(false); 
-
+      setIsModalOpen(false);
     } catch (error) {
       console.error("Network or Client Error occurred:", error);
-      alert("Could not connect to the booking server. Please check your network connection.");
+      alert(
+        "Could not connect to the booking server. Please check your network connection.",
+      );
     }
   };
 
   return (
     <>
-      
-
-      {/* Availability Slots Selector */}
       <div className="space-y-3">
         <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
           Select Availability
@@ -154,7 +155,6 @@ export default function AppointmentScheduler({
 
       <hr className="border-slate-100 my-2" />
 
-      {/* Bottom Form Checkout Panel */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-1">
         <div className="space-y-0.5">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
@@ -175,14 +175,14 @@ export default function AppointmentScheduler({
           Book Appointment
         </button>
       </div>
-
-      {/* ================= MODAL DIALOG OVERLAY ================= */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 overscroll-contain flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 overflow-auto">
-          <div className="absolute inset-0" onClick={() => setIsModalOpen(false)} />
+          <div
+            className="absolute inset-0"
+            onClick={() => setIsModalOpen(false)}
+          />
 
           <div className="bg-white w-full max-w-md h-[80vh] rounded-3xl shadow-2xl relative z-10 overflow-hidden border border-slate-100 flex flex-col pointer-events-auto">
-            
             <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between shrink-0">
               <h3 className="text-xl font-bold text-slate-900 tracking-tight">
                 Book Appointment
@@ -335,13 +335,16 @@ export default function AppointmentScheduler({
               <div className="pt-2 space-y-3 shrink-0">
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-gradient-to-r from-[#2563eb] to-[#38bdf8] hover:from-[#1d4ed8] hover:to-[#0ea5e9] text-white font-bold text-sm rounded-xl tracking-wide transition-all shadow-md active:scale-[0.99] cursor-pointer text-center"
+                  className="w-full py-3.5 bg-linear-to-r from-[#2563eb] to-[#38bdf8] hover:from-[#1d4ed8] hover:to-[#0ea5e9] text-white font-bold text-sm rounded-xl tracking-wide transition-all shadow-md active:scale-[0.99] cursor-pointer text-center"
                 >
                   Confirm Booking
                 </button>
                 <p className="text-[10px] text-slate-400 text-center leading-relaxed max-w-xs mx-auto">
                   By confirming, you agree to our{" "}
-                  <a href="/terms" className="text-blue-500 hover:underline font-medium">
+                  <a
+                    href="/terms"
+                    className="text-blue-500 hover:underline font-medium"
+                  >
                     Terms of Service
                   </a>
                   .

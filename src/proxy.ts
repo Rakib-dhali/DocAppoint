@@ -12,7 +12,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  return NextResponse.next(); // ✅ was missing before
+  return NextResponse.next();
 }
 
 export const config = {

@@ -24,16 +24,12 @@ export default function RegisterPage() {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-
-  // Track if the password field has been blurred or if form attempted submission
   const [passwordTouched, setPasswordTouched] = useState(false);
 
-  // Live Validation Checks
   const hasUppercase = /[A-Z]/.test(formData.password);
   const hasLowercase = /[a-z]/.test(formData.password);
   const isLongEnough = formData.password.length >= 6;
 
-  // Calculate standard criteria fulfilled score (0 to 3)
   const strengthScore = [hasUppercase, hasLowercase, isLongEnough].filter(
     Boolean,
   ).length;
@@ -47,16 +43,15 @@ export default function RegisterPage() {
     e.preventDefault();
     setPasswordTouched(true);
 
-    // Stop execution if requirements are not fulfilled
     if (!hasUppercase || !hasLowercase || !isLongEnough) {
       return;
     }
     const { fullName, email, photoUrl, password } = formData;
-    const { data, error } = await authClient.signUp.email({
+    const { error } = await authClient.signUp.email({
       name: fullName,
       email,
       password,
-      image:photoUrl,
+      image: photoUrl,
     });
     if (error) {
       toast.error(error.message!);
@@ -65,17 +60,20 @@ export default function RegisterPage() {
     toast.success("Account created successfully!");
     redirect("/login");
   };
-   const googleSignUp = async () => {
-    const { error } = await authClient.signIn.social({
+  const googleSignUp = async () => {
+    const { data, error } = await authClient.signIn.social({
       provider: "google",
     });
     if (error) {
       toast.error(error.message!);
       return;
     }
+    if (data){
+      toast.success("logged in successfully!");
+      redirect("/")
+    }
   };
 
-  // Helper utility to control strength UI variables dynamically
   const getStrengthMeta = () => {
     if (formData.password.length === 0)
       return { label: "None", color: "bg-slate-100" };
@@ -89,9 +87,7 @@ export default function RegisterPage() {
 
   return (
     <div className="w-full min-h-screen flex flex-col md:flex-row bg-white text-[#1e293b] max-w-350 mx-auto py-5 md:py-10 lg:py-15 px-6 md:px-12 lg:px-18 xl:px-24">
-      {/* LEFT SIDE: Marketing Banner (Hidden on mobile/tablet, visible on md and up) */}
       <div className="hidden md:flex md:w-1/2 lg:w-[45%] bg-linear-to-b from-[#3b82f6] to-[#1d4ed8] text-white p-8 lg:p-12 flex-col justify-between items-center relative overflow-hidden">
-        {/* Main Copy */}
         <div className="text-center max-w-md my-auto px-4">
           <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight mb-6">
             Revolutionizing healthcare access.
@@ -102,7 +98,6 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {/* Mockup Image Preview Display mimicking dashboard UI inside the screenshot */}
         <div className="w-full max-w-85 lg:max-w-95 aspect-square bg-[#0c1322] border-4 border-white/20 rounded-xl p-4 shadow-2xl mb-4 transform hover:scale-[1.02] transition-transform duration-300">
           <div className="w-full h-full opacity-80 flex flex-col justify-between text-[10px] text-slate-400 font-mono">
             <div className="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -137,10 +132,8 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      {/* RIGHT SIDE: Create Account Form */}
       <div className="w-full md:w-1/2 lg:w-[55%] border border-blue-500 bg-white px-6 py-12 sm:px-12 lg:px-20 flex flex-col justify-center items-center">
         <div className="w-full max-w-md">
-          {/* Header Text */}
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">
             Create Account
           </h2>
@@ -148,9 +141,7 @@ export default function RegisterPage() {
             Start your journey to better health management today.
           </p>
 
-          {/* Form Elements */}
           <form className="space-y-5" onSubmit={handleSubmit}>
-            {/* Input: Full Name */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                 Full Name
@@ -170,7 +161,6 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Input: Email Address */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                 Email Address
@@ -190,7 +180,6 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Input: Photo URL */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                 Photo URL
@@ -210,7 +199,6 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Input: Password (Modified with Live Validation UI) */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                 Password
@@ -241,7 +229,6 @@ export default function RegisterPage() {
                 </button>
               </div>
 
-              {/* Dynamic Progress Strength Indicator Bars */}
               <div className="mt-2.5">
                 <div className="grid grid-cols-3 gap-1.5">
                   <div
@@ -264,7 +251,6 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {/* Requirement Rule Checks Checklist */}
               <ul className="mt-3 space-y-1.5 text-xs border-t border-slate-100 pt-2.5">
                 <li
                   className={`flex items-center gap-2 transition-colors duration-200 ${isLongEnough ? "text-emerald-600 font-medium" : "text-slate-400"}`}
@@ -299,7 +285,6 @@ export default function RegisterPage() {
               </ul>
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               className="w-full bg-gradient-to-r from-[#3ba2f6] to-[#3b82f6] hover:from-[#2563eb] hover:to-[#3b82f6] text-white font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-[0.99]"
@@ -321,7 +306,6 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          {/* Divider */}
           <div className="relative my-6 flex items-center justify-center">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-slate-100"></div>
@@ -331,8 +315,8 @@ export default function RegisterPage() {
             </span>
           </div>
 
-          {/* Google Social OAuth Button */}
-          <button onClick={googleSignUp}
+          <button
+            onClick={googleSignUp}
             type="button"
             className="w-full border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2.5 transition-all text-sm shadow-sm"
           >
@@ -361,7 +345,6 @@ export default function RegisterPage() {
             <span>Sign up with Google</span>
           </button>
 
-          {/* Login Link Redirect */}
           <p className="text-sm text-center text-slate-600 mt-6">
             Already have an account?{" "}
             <Link
@@ -372,7 +355,6 @@ export default function RegisterPage() {
             </Link>
           </p>
 
-          {/* Bottom Policy Terms text */}
           <p className="text-[11px] text-center text-slate-400 mt-10 leading-relaxed px-4">
             By registering, you agree to DocAppoint&#39;s{" "}
             <a href="#terms" className="underline hover:text-slate-600">

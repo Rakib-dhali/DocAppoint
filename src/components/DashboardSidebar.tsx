@@ -1,10 +1,10 @@
 "use client";
 
-import React from "react";
 import { Calendar, User, LogOut, Edit2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import Image from "next/image";
 
 interface UserProfile {
   name?: string;
@@ -35,15 +35,16 @@ export function DashboardSidebar() {
 
   return (
     <>
-      {/* ================= DESKTOP SIDEBAR ================= */}
       <aside className="w-64 bg-white border-r border-slate-100 hidden md:flex flex-col justify-between shrink-0 pr-4">
         <div>
           <div className="px-6 py-4 flex items-center gap-3 mb-4 group relative">
             <div className="relative">
-              <img
+              <Image
+                width={40}
+                height={40}
                 src={userProfile.photoUrl}
                 alt={userProfile.name || "User Avatar"}
-                className="w-10 h-10 rounded-full object-cover ring-2 ring-blue-500/20 ring-offset-2"
+                className="rounded-full object-cover ring-2 ring-blue-500/20 ring-offset-2"
               />
               <Link
                 href="/dashboard/my-profile"
@@ -89,7 +90,7 @@ export function DashboardSidebar() {
         </div>
 
         <div className="pt-4 border-t border-slate-50">
-          <button 
+          <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50/50 font-bold text-sm rounded-xl transition-all cursor-pointer text-left"
           >
@@ -98,8 +99,6 @@ export function DashboardSidebar() {
           </button>
         </div>
       </aside>
-
-      {/* ================= MOBILE BOTTOM NAVIGATION ================= */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200/80 shadow-lg px-6 py-2 flex items-center justify-around md:hidden pb-safe">
         <Link
           href="/dashboard/my-booking"
